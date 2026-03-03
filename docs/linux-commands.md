@@ -472,6 +472,25 @@ df -h                            # human-readable
 df -h /home                      # specific mount point
 ```
 
+### `env` — Display or modify environment variables
+
+```bash
+env                              # show all environment variables
+env | grep HOME                  # filter specific variables
+env VAR=value command            # run command with custom variable
+env -i COMMAND                   # run command with empty environment
+```
+
+### `set` — Display or modify shell variables and functions
+
+```bash
+set                              # show all shell variables and functions
+set | grep PATH                  # filter specific variables
+set -x                           # enable debug mode (show commands)
+set +x                           # disable debug mode
+set -e                           # exit on error
+```
+
 ---
 
 ## <a id="12-process-management"></a>12. Process Management [↑](#table-of-contents)
