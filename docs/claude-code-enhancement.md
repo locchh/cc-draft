@@ -27,7 +27,6 @@
 
 ### [ai1-skills](https://github.com/hieutrtr/ai1-skills) — Community-built skill collection on GitHub
 
-
 ## Online Resources
 
 ### [Superpowers](https://github.com/obra/superpowers) — A collection of skills for Claude Code
@@ -44,20 +43,20 @@
 
 ## Code Quality Tools
 
-[Ruff](https://github.com/astral-sh/ruff)
+### [Ruff](https://github.com/astral-sh/ruff)
 
-[myPy](https://mypy.readthedocs.io/en/stable/)
+### [myPy](https://mypy.readthedocs.io/en/stable/)
 
-[PMD](https://github.com/pmd/pmd)
+### [PMD](https://github.com/pmd/pmd)
 
-[Semgrep](https://github.com/semgrep/semgrep)
+### [Semgrep](https://github.com/semgrep/semgrep)
 
-[CodeQL](https://codeql.github.com/)
+### [CodeQL](https://codeql.github.com/)
 
-[SonarQube](https://www.sonarqube.org/)
+### [SonarQube](https://www.sonarqube.org/)
 
-[VeraCode](https://www.veracode.com/)
+### [VeraCode](https://www.veracode.com/)
 
-[Coverity](https://www.blackduck.com/static-analysis-tools-sast/coverity.html)
+### [Coverity](https://www.blackduck.com/static-analysis-tools-sast/coverity.html)
 
-[BlackDuck](https://www.blackduck.com/)
+### [BlackDuck](https://www.blackduck.com/)
