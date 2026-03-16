@@ -51,6 +51,61 @@ Explanation:
 - [specs/](https://github.com/ghuntley/how-to-ralph-wiggum?tab=readme-ov-file#specs): One markdown file per topic of concern. These are the source of truth for what should be built.
 - [src/, src/lib/](https://github.com/ghuntley/how-to-ralph-wiggum?tab=readme-ov-file#src-and-srclib): Application source code and shared utilities/components.
 
+### Workflow
+
+```mermaid
+flowchart TD                                                                                                                                                     
+      A[Idea] --> B[Break into topics]                                                                                                                           
+      B --> C[Write specs/*.md]                                                                                                                                    
+      C --> D[PLANNING MODE\nRead specs + code\nWrite IMPLEMENTATION_PLAN.md]
+      D --> E                                                                                                                                                      
+                                                                                                                                                                 
+      subE[BUILDING MODE]             
+      subgraph subE[BUILDING MODE]
+          E[Read specs + plan] --> F[Pick a task]
+          F --> G[Implement]
+          G --> H{Tests pass?}
+          H -- No --> G
+          H -- Yes --> I[Commit + update plan]
+      end
+
+      I --> J[Context cleared]
+      J --> K{Plan done?}
+      K -- No --> E
+      K -- Yes --> L[Done]
+```
+
+**[Phase 1. Define Requirements (LLM conversation)](https://github.com/ghuntley/how-to-ralph-wiggum?tab=readme-ov-file#phase-1-define-requirements-llm-conversation)**
+
+BRAINSTORMING mode:
+
+- Discuss project ideas → identify Jobs to Be Done (JTBD)
+- Break individual JTBD into topic(s) of concern
+- Use subagents to load info from URLs into context
+- LLM understands JTBD topic of concern: subagent writes `specs/FILENAME.md` for each topic
+
+**[Phase 2 / 3. Run Ralph Loop (two modes, swap PROMPT.md as needed)](https://github.com/ghuntley/how-to-ralph-wiggum?tab=readme-ov-file#phase-2--3-run-ralph-loop-two-modes-swap-promptmd-as-needed)**
+
+PLANNING mode loop lifecycle:
+
+- Subagents study `specs/*` and existing `/src`
+- Compare specs against code (gap analysis)
+- Create/update `IMPLEMENTATION_PLAN.md` with prioritized tasks
+- No implementation
+
+BUILDING mode loop lifecycle:
+
+- Orient – subagents study `specs/*` (requirements)
+- Read plan – study `IMPLEMENTATION_PLAN.md`
+- Select – pick the most important task
+- Investigate – subagents study relevant `/src` ("don't assume not implemented")
+- Implement – N subagents for file operations
+- Validate – 1 subagent for build/tests (backpressure)
+- Update `IMPLEMENTATION_PLAN.md` – mark task done, note discoveries/bugs
+- Update `AGENTS.md` – if operational learnings
+- Commit
+- Loop ends → context cleared → next iteration starts fresh
+
 #### Simple Ralph Loop
 
 ```bash
