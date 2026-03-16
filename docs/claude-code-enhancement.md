@@ -42,7 +42,8 @@ project-root/
 └── src/lib/                        # Shared utilities & components
 ```
 
-Explanation: 
+Explanation:
+
 - [loop.sh](https://github.com/ghuntley/how-to-ralph-wiggum?tab=readme-ov-file#loopsh): The outer loop script that orchestrates Ralph iterations.
 - [PROMPT_build.md](https://github.com/ghuntley/how-to-ralph-wiggum?tab=readme-ov-file#prompt_planmd-template): The instruction set for each loop iteration in build mode.
 - [PROMPT_plan.md](https://github.com/ghuntley/how-to-ralph-wiggum?tab=readme-ov-file#prompt_planmd-template): The instruction set for each loop iteration in plan mode.
@@ -54,25 +55,30 @@ Explanation:
 ### Workflow
 
 ```mermaid
-flowchart TD                                                                                                                                                     
-      A[Idea] --> B[Break into topics]                                                                                                                           
-      B --> C[Write specs/*.md]                                                                                                                                    
-      C --> D[PLANNING MODE\nRead specs + code\nWrite IMPLEMENTATION_PLAN.md]
-      D --> E                                                                                                                                                      
-                                                                                                                                                                 
-      subE[BUILDING MODE]             
-      subgraph subE[BUILDING MODE]
-          E[Read specs + plan] --> F[Pick a task]
-          F --> G[Implement]
-          G --> H{Tests pass?}
-          H -- No --> G
-          H -- Yes --> I[Commit + update plan]
-      end
+flowchart TD
+    A[Idea] --> B[Jobs to Be Done - JTBD]
+    B --> C[Topics of Concern\none per distinct aspect]
+    C --> D["Write specs/*.md\none file per topic"]
+    D --> E
 
-      I --> J[Context cleared]
-      J --> K{Plan done?}
-      K -- No --> E
-      K -- Yes --> L[Done]
+    subgraph PLAN[PLANNING MODE — PROMPT_plan.md + AGENTS.md]
+        E[Gap analysis\nspecs vs code] --> F[Write IMPLEMENTATION_PLAN.md]
+    end
+
+    F --> G
+
+    subgraph BUILD[BUILDING MODE — PROMPT_build.md + AGENTS.md]
+        G[Read specs + IMPLEMENTATION_PLAN.md] --> H[Pick a task]
+        H --> I[Implement]
+        I --> J{Tests pass?}
+        J -- No --> I
+        J -- Yes --> K[Commit + update plan]
+    end
+
+    K --> L[Context cleared]
+    L --> M{Plan done?}
+    M -- No --> G
+    M -- Yes --> N[Done]
 ```
 
 **[Phase 1. Define Requirements (LLM conversation)](https://github.com/ghuntley/how-to-ralph-wiggum?tab=readme-ov-file#phase-1-define-requirements-llm-conversation)**
