@@ -56,9 +56,13 @@ Explanation:
 
 ```mermaid
 flowchart TD
-    A[Idea] --> B[Jobs to Be Done - JTBD]
-    B --> C["Topics of Concern<br/>one per distinct aspect"]
-    C --> D["Write specs/*.md<br/>one file per topic"]
+    A[Idea] --> B
+
+    subgraph BRAINSTORM[BRAINSTORMING MODE — Human + LLM conversation]
+        B[Jobs to Be Done - JTBD] --> C["Topics of Concern<br/>one per distinct aspect"]
+        C --> D["Write specs/*.md<br/>one file per topic"]
+    end
+
     D --> E
 
     subgraph PLAN[PLANNING MODE — PROMPT_plan.md + AGENTS.md]
