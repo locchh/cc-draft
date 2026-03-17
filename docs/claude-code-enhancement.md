@@ -2,6 +2,14 @@
 
 ## 🔄 Ralph Loop
 
+There are some variant of this idea but i love this phylosophy
+
+> The technique is described as "deterministically bad in an undeterministic world" - failures are predictable, enabling systematic improvement through prompt tuning.
+
+Meaning which the same prompt, the LLM some how failed around a some deterministic reasons, so, we can improve the prompt    
+and support it success, it better and more understandable than let the LLM run success at the first without not sure it will    
+correct in next time
+
 ### [How to Ralph Wiggum](https://github.com/ghuntley/how-to-ralph-wiggum#)
 
 #### Concepts
