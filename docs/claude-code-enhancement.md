@@ -403,6 +403,20 @@ Without this (or `--max-iterations`), the loop runs indefinitely.
 3. Self-Correction
 4. Escape Hatches: Always use `--max-iterations` as a safety net to prevent infinite loops on impossible tasks
 
+#### Example
+
+```
+# Use --max-iterations when you want to run a task exactly N times
+/ralph-loop:ralph-loop SAY HELLO --max-iterations 3
+
+# Use --completion-promise when you don’t know how many iterations it will take
+/ralph-loop:ralph-loop SAY HELLO --completion-promise "DONE"
+
+# Use both when you don’t know exactly when the task will finish,
+# but you want to prevent it from running infinitely
+/ralph-loop:ralph-loop SAY HELLO --completion-promise "DONE" --max-iterations 3
+```
+
 ### [Ralph](https://github.com/snarktank/ralph)
 
 ### [ralphmad](https://github.com/hieutrtr/ralphmad)
@@ -456,3 +470,27 @@ Without this (or `--max-iterations`), the loop runs indefinitely.
 ### [Coverity](https://www.blackduck.com/static-analysis-tools-sast/coverity.html)
 
 ### [BlackDuck](https://www.blackduck.com/)
+
+## 📐 Design
+
+| Tool              | Auto Nav from Folder | llms.txt Auto | Heading Anchors | MDX        | Mermaid    | PlantUML   | Self-host        | Search Built-in   | Build ~100 files | Build ~5000 files | Price |
+|-------------------|---------------------|---------------|------------------|------------|------------|------------|------------------|-------------------|------------------|-------------------|-------|
+| [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) | ✓ plugin | ✓ plugin | ✓ | ✗ (macros) | ✓ built-in | ✓ plugin | ✓ | ✓ built-in | ~2s | ~60-120s | free |
+| [Astro Starlight](https://starlight.astro.build/) | ✓ built-in | ✓ plugin | ✓ | ✓ | ~ plugin | ~ plugin | ✓ | ✓ Pagefind | ~10s | ~8-15min | free |
+| [Docusaurus](https://docusaurus.io/) | ~ plugin | ✗ manual | ✓ | ✓ | ~ plugin | ~ plugin | ✓ | ~ Algolia/local | ~15s | ~10-20min | free |
+| [VitePress](https://vitepress.dev/) | ✗ manual | ✗ manual | ✓ | ✗ (Vue) | ~ plugin | ~ plugin | ✓ | ✓ built-in | ~5s | ~3-6min | free |
+| [Nextra](https://nextra.site/) | ✓ file-based | ✗ manual | ✓ | ✓ | ~ plugin | ~ plugin | ✓ | ✓ Flexsearch | ~10s | ~8-15min | free |
+| [Mintlify](https://mintlify.com/) | ✓ built-in | ✓ built-in | ✓ | ✓ | ✓ built-in | ✗ | ✗ hosted only | ✓ built-in | instant | instant | paid |
+| [GitBook](https://www.gitbook.com/) | ✓ built-in | ✗ | ✓ | ✗ | ✓ built-in | ✗ | ✗ hosted only | ✓ built-in | instant | instant | paid |
+
+---
+
+**Legend:** ✓ = native support / ✗ = not supported / ~ = needs plugin or extra config
+
+---
+
+### Takeaway
+
+- Best overall self-hosted: **MkDocs Material** — fastest build, most complete auto-indexing  
+- Best if you need MDX: **Astro Starlight** — close second, good plugin ecosystem  
+- Best if budget is available: **Mintlify** — zero config, everything built-in, but no self-hosting
