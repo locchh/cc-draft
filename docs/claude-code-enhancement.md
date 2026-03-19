@@ -391,14 +391,14 @@ graph TD
     N -->|Same Prompt<br/>Same Context| D
     J -->|Exit| O["Session Ends"]
 
-    style A fill:#1976d2,color:#fff
-    style D fill:#f57c00,color:#fff
-    style F fill:#7b1fa2,color:#fff
-    style I fill:#c62828,color:#fff
-    style K fill:#c62828,color:#fff
-    style L fill:#388e3c,color:#fff
-    style J fill:#d32f2f,color:#fff
-    style O fill:#d32f2f,color:#fff
+    style A fill:#3a3a3a,color:#ccc
+    style D fill:#4a4a4a,color:#ccc
+    style F fill:#4a3a4a,color:#ccc
+    style I fill:#4a3a3a,color:#ccc
+    style K fill:#4a3a3a,color:#ccc
+    style L fill:#3a4a3a,color:#ccc
+    style J fill:#4a3a3a,color:#ccc
+    style O fill:#4a3a3a,color:#ccc
 ```
 
 Stop Hook Workflow:
