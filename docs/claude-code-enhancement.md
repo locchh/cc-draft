@@ -494,11 +494,13 @@ Without this (or `--max-iterations`), the loop runs indefinitely.
 /ralph-loop:ralph-loop SAY HELLO --completion-promise "DONE" --max-iterations 3
 ```
 
-### [Ralph](https://github.com/snarktank/ralph)
+### Ralph Loop Variants
 
-### [ralphmad](https://github.com/hieutrtr/ralphmad)
+- [ralphmad](https://github.com/hieutrtr/ralphmad): `ralph-loop` + BMAD SDLC on top. Stop-hook mechanism, but prompt is a template populated from project artifacts at runtime. 14 phase-gated workflows (product brief → PRD → architecture → epics → implementation). Human manually triggers each phase. Claude Code only.
 
-### [Bmalph](https://github.com/LarsCowe/bmalph)
+- [Ralph](https://github.com/snarktank/ralph): Generic Ralph variant. External bash loop, fresh context each iteration. Task list in prd.json (passes: true/false). Supports both Amp and Claude Code. Has a React flowchart visualizer as docs.
+
+- [Bmalph](https://github.com/LarsCowe/bmalph): Full production tool. npm CLI (bmalph run) with Node.js TUI dashboard, external bash loop, multi-platform (Claude Code/Codex/Cursor/Windsurf/Copilot/Aider). Bundles BMAD + Ralph. Human does planning interactively, then fully automated implementation. Circuit breaker, rate limiting, detach support. 
 
 ## 📋 Spec-Driven Development
 
