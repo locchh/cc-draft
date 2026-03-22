@@ -18,6 +18,7 @@
 - [12. Worktrees](#12-worktrees)
 - [13. Claude code on GitHub](#13-claude-code-on-github)
 - [14. Spec-driven](#14-spec-driven) 🔥
+- [15. Ralph-loop](#15-ralph-loop)
 
 ## <a id="1-settings"></a>1. [Settings](https://code.claude.com/docs/en/settings) [↑](#table-of-contents)
 
@@ -1254,8 +1255,8 @@ After connecting Claude with GitHub, you can run `/install-github-app` to instal
 
 ## <a id="14-spec-driven"></a>14. Spec-driven [↑](#table-of-contents)
 
-- [Plannotator](https://github.com/backnotprop/plannotator)
-- [Spec-kit](https://github.com/github/spec-kit)
-- [BMAD](https://github.com/bmad-code-org/BMAD-METHOD)
-- [Design OS](https://github.com/buildermethods/design-os)
-- [Agent OS](https://github.com/buildermethods/agent-os)
+[More detail](./spec-driven-development.md)
+
+## <a id="15-ralph-loop"></a>15. Ralph Loop [↑](#table-of-contents)
+
+[More detail](./claude-code-enhancement.md#-ralph-loop)
