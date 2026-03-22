@@ -72,6 +72,8 @@ GSD's author explicitly mentions Spec Kit and BMAD as "more complicated than nee
 
 [BMAD](https://github.com/bmad-code-org/BMAD-METHOD)
 
-[Spec Kit](https://github.com/github/spec-kit)
+[SpecKit](https://github.com/github/spec-kit)
+
+[SpecKit in Action](https://github.com/mduongvandinh/spec-kit-docs)
 
 [Agent OS](https://github.com/buildermethods/agent-os)
