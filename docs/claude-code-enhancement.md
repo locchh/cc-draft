@@ -1,13 +1,30 @@
 # Claude Code Enhancement
 
+## Table of Contents
+
+- [🧹 Clean Coder](#-clean-coder)
+- [🔄 Ralph Loop](#-ralph-loop)
+- [📋 Spec-Driven Development](#-spec-driven-development)
+- [🌐 Online Resources](#-online-resources)
+- [🔍 Code Quality Tools](#-code-quality-tools)
+- [📐 Design](#-design)
+
+---
+
+## [🧹 Clean Coder](https://blog.cleancoder.com/)
+
+- [How to Think](./how-to-think.md)
+- [What Developer Do Everyday](./what-developer-do-everyday.md)
+- [How to Review Code](./how-to-review-code.md)
+
 ## 🔄 Ralph Loop
 
 There are some variant of this idea but i love this phylosophy
 
 > The technique is described as "deterministically bad in an undeterministic world" - failures are predictable, enabling systematic improvement through prompt tuning.
 
-Meaning which the same prompt, the LLM some how failed around a some deterministic reasons, so, we can improve the prompt    
-and support it success, it better and more understandable than let the LLM run success at the first without not sure it will    
+Meaning which the same prompt, the LLM some how failed around a some deterministic reasons, so, we can improve the prompt  
+and support it success, it better and more understandable than let the LLM run success at the first without not sure it will  
 correct in next time
 
 ### [How to Ralph Wiggum](https://github.com/ghuntley/how-to-ralph-wiggum#)
@@ -365,6 +382,7 @@ The `"decision": "block"` response prevents Claude from exiting — and `"reason
    - Return to step 3 (execution phase)
 
 Loop termination only when:
+
 - `max_iterations` limit is reached, OR
 - Claude outputs `<promise>COMPLETION_PROMISE</promise>` matching the configured promise
 
@@ -500,7 +518,7 @@ Without this (or `--max-iterations`), the loop runs indefinitely.
 
 - [Ralph](https://github.com/snarktank/ralph): Generic Ralph variant. External bash loop, fresh context each iteration. Task list in prd.json (passes: true/false). Supports both Amp and Claude Code. Has a React flowchart visualizer as docs.
 
-- [Bmalph](https://github.com/LarsCowe/bmalph): Full production tool. npm CLI (bmalph run) with Node.js TUI dashboard, external bash loop, multi-platform (Claude Code/Codex/Cursor/Windsurf/Copilot/Aider). Bundles BMAD + Ralph. Human does planning interactively, then fully automated implementation. Circuit breaker, rate limiting, detach support. 
+- [Bmalph](https://github.com/LarsCowe/bmalph): Full production tool. npm CLI (bmalph run) with Node.js TUI dashboard, external bash loop, multi-platform (Claude Code/Codex/Cursor/Windsurf/Copilot/Aider). Bundles BMAD + Ralph. Human does planning interactively, then fully automated implementation. Circuit breaker, rate limiting, detach support.
 
 ## 📋 Spec-Driven Development
 
@@ -542,15 +560,15 @@ Without this (or `--max-iterations`), the loop runs indefinitely.
 
 ## 📐 Design
 
-| Tool              | Auto Nav from Folder | llms.txt Auto | Heading Anchors | MDX        | Mermaid    | PlantUML   | Self-host        | Search Built-in   | Build ~100 files | Build ~5000 files | Price |
-|-------------------|---------------------|---------------|------------------|------------|------------|------------|------------------|-------------------|------------------|-------------------|-------|
-| [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) | ✓ plugin | ✓ plugin | ✓ | ✗ (macros) | ✓ built-in | ✓ plugin | ✓ | ✓ built-in | ~2s | ~60-120s | free |
-| [Astro Starlight](https://starlight.astro.build/) | ✓ built-in | ✓ plugin | ✓ | ✓ | ~ plugin | ~ plugin | ✓ | ✓ Pagefind | ~10s | ~8-15min | free |
-| [Docusaurus](https://docusaurus.io/) | ~ plugin | ✗ manual | ✓ | ✓ | ~ plugin | ~ plugin | ✓ | ~ Algolia/local | ~15s | ~10-20min | free |
-| [VitePress](https://vitepress.dev/) | ✗ manual | ✗ manual | ✓ | ✗ (Vue) | ~ plugin | ~ plugin | ✓ | ✓ built-in | ~5s | ~3-6min | free |
-| [Nextra](https://nextra.site/) | ✓ file-based | ✗ manual | ✓ | ✓ | ~ plugin | ~ plugin | ✓ | ✓ Flexsearch | ~10s | ~8-15min | free |
-| [Mintlify](https://mintlify.com/) | ✓ built-in | ✓ built-in | ✓ | ✓ | ✓ built-in | ✗ | ✗ hosted only | ✓ built-in | instant | instant | paid |
-| [GitBook](https://www.gitbook.com/) | ✓ built-in | ✗ | ✓ | ✗ | ✓ built-in | ✗ | ✗ hosted only | ✓ built-in | instant | instant | paid |
+| Tool                                                            | Auto Nav from Folder | llms.txt Auto | Heading Anchors | MDX        | Mermaid    | PlantUML | Self-host     | Search Built-in | Build ~100 files | Build ~5000 files | Price |
+| --------------------------------------------------------------- | -------------------- | ------------- | --------------- | ---------- | ---------- | -------- | ------------- | --------------- | ---------------- | ----------------- | ----- |
+| [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) | ✓ plugin             | ✓ plugin      | ✓               | ✗ (macros) | ✓ built-in | ✓ plugin | ✓             | ✓ built-in      | ~2s              | ~60-120s          | free  |
+| [Astro Starlight](https://starlight.astro.build/)               | ✓ built-in           | ✓ plugin      | ✓               | ✓          | ~ plugin   | ~ plugin | ✓             | ✓ Pagefind      | ~10s             | ~8-15min          | free  |
+| [Docusaurus](https://docusaurus.io/)                            | ~ plugin             | ✗ manual      | ✓               | ✓          | ~ plugin   | ~ plugin | ✓             | ~ Algolia/local | ~15s             | ~10-20min         | free  |
+| [VitePress](https://vitepress.dev/)                             | ✗ manual             | ✗ manual      | ✓               | ✗ (Vue)    | ~ plugin   | ~ plugin | ✓             | ✓ built-in      | ~5s              | ~3-6min           | free  |
+| [Nextra](https://nextra.site/)                                  | ✓ file-based         | ✗ manual      | ✓               | ✓          | ~ plugin   | ~ plugin | ✓             | ✓ Flexsearch    | ~10s             | ~8-15min          | free  |
+| [Mintlify](https://mintlify.com/)                               | ✓ built-in           | ✓ built-in    | ✓               | ✓          | ✓ built-in | ✗        | ✗ hosted only | ✓ built-in      | instant          | instant           | paid  |
+| [GitBook](https://www.gitbook.com/)                             | ✓ built-in           | ✗             | ✓               | ✗          | ✓ built-in | ✗        | ✗ hosted only | ✓ built-in      | instant          | instant           | paid  |
 
 ---
 
@@ -560,6 +578,6 @@ Without this (or `--max-iterations`), the loop runs indefinitely.
 
 ### Takeaway
 
-- Best overall self-hosted: **MkDocs Material** — fastest build, most complete auto-indexing  
-- Best if you need MDX: **Astro Starlight** — close second, good plugin ecosystem  
+- Best overall self-hosted: **MkDocs Material** — fastest build, most complete auto-indexing
+- Best if you need MDX: **Astro Starlight** — close second, good plugin ecosystem
 - Best if budget is available: **Mintlify** — zero config, everything built-in, but no self-hosting
