@@ -66,6 +66,37 @@ claude --permission-mode plan
 
 `dontAsk` is never in the `Shift+Tab` cycle. `bypassPermissions` appears in the cycle only if you started the session with `--permission-mode bypassPermissions`, `--dangerously-skip-permissions`, or `--allow-dangerously-skip-permissions`.
 
+### [Manage permissions](https://code.claude.com/docs/en/permissions#manage-permissions)
+
+You can view and manage Claude Code’s tool permissions with `/permissions`. This UI lists all permission rules and the settings.json file they are sourced from.
+
+1. **Allow** rules let Claude Code use the specified tool without manual approval.
+
+2. **Ask** rules prompt for confirmation whenever Claude Code tries to use the specified tool.
+
+3. **Deny** rules prevent Claude Code from using the specified tool.
+
+Example:
+
+```json
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(npm run lint)",
+      "Bash(npm run test *)",
+      "Read(~/.zshrc)"
+    ],
+    "deny": [
+      "Bash(curl *)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)"
+    ],
+  }
+}
+```
+
 ### [Plan Mode](https://code.claude.com/docs/en/common-workflows#use-plan-mode-for-safe-code-analysis)
 
 - `Shift-Tab` x2 to toggle thinking mode
@@ -83,6 +114,13 @@ Lets Claude execute actions without showing permission prompts by using  a class
 ```bash
 claude --enable-auto-mode
 ```
+
+Each action goes through a fixed decision order. The first matching step wins:
+
+1. Actions matching your allow or deny rules resolve immediately
+2. Read-only actions and file edits in your working directory are auto-approved
+3. Everything else goes to the classifier
+4. If the classifier blocks, Claude receives the reason and attempts an alternative approach
 
 During a session: press `Shift+Tab` to cycle through `default → acceptEdits → plan → auto`. The current mode appears in the status bar. `auto` does not appear in the cycle until you pass `--enable-auto-mode` at startup
 
