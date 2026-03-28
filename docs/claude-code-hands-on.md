@@ -44,7 +44,7 @@ Scopes apply to many Claude Code features:
 
 ## <a id="2-permission-modes"></a>2. [Permission Modes](https://code.claude.com/docs/en/permission-modes) [↑](#table-of-contents)
 
-### Available modes
+### [Available modes](https://code.claude.com/docs/en/permission-modes#available-modes)
 
 Each mode makes a different tradeoff between convenience and oversight. Pick the one that matches your task.
 
