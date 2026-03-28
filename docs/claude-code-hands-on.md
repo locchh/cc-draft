@@ -6,20 +6,21 @@
 
 - [1. Settings](#1-settings)
 - [2. Permission Modes](#2-permission-modes)
-- [3. Memory](#3-memory)
-- [4. Skills](#4-skills)
-- [5. Subagents](#5-subagents)
-- [6. Agent teams](#6-agent-teams)
-- [7. MCP](#7-mcp)
-- [8. Hooks](#8-hooks)
-- [9. Plugins](#9-plugins)
-- [10. Manage your session](#10-manage-your-session)
-- [11. Slash commands](#11-slash-commands)
-- [12. Worktrees](#12-worktrees)
-- [13. Claude code on GitHub](#13-claude-code-on-github)
-- [14. Spec-driven](#14-spec-driven) 🔥
-- [15. Ralph-loop](#15-ralph-loop)
-- [16. Status line](#16-status-line)
+- [3. Rules](#3-rules)
+- [4. Memory](#4-memory)
+- [5. Skills](#5-skills)
+- [6. Subagents](#6-subagents)
+- [7. Agent teams](#7-agent-teams)
+- [8. MCP](#8-mcp)
+- [9. Hooks](#9-hooks)
+- [10. Plugins](#10-plugins)
+- [11. Manage your session](#11-manage-your-session)
+- [12. Slash commands](#12-slash-commands)
+- [13. Worktrees](#13-worktrees)
+- [14. Claude code on GitHub](#14-claude-code-on-github)
+- [15. Spec-driven](#15-spec-driven) 🔥
+- [16. Ralph-loop](#16-ralph-loop)
+- [17. Status line](#17-status-line)
 
 ## <a id="1-settings"></a>1. [Settings](https://code.claude.com/docs/en/settings) [↑](#table-of-contents)
 
@@ -124,40 +125,93 @@ Each action goes through a fixed decision order. The first matching step wins:
 
 During a session: press `Shift+Tab` to cycle through `default → acceptEdits → plan → auto`. The current mode appears in the status bar. `auto` does not appear in the cycle until you pass `--enable-auto-mode` at startup
 
-## <a id="3-memory"></a>3. [Memory](https://code.claude.com/docs/en/memory) [↑](#table-of-contents)
+## <a id="3-rules"></a>3. [Rules](https://code.claude.com/docs/en/memory#organize-rules-with-claude/rules/) [↑](#table-of-contents)
+
+Project instructions split into topic files that can load conditionally based on file paths. A rule without paths: frontmatter loads at session start like `CLAUDE.md`; a rule with paths: loads only when Claude reads a matching file. Like `CLAUDE.md`, rules are guidance Claude reads, not configuration Claude Code enforces.
+
+**Tips**
+
+- Use `paths`: frontmatter with globs to scope rules to directories or file types
+- Subdirectories work: `.claude/rules/frontend/react.md` is discovered automatically
+- When `CLAUDE.md` approaches 200 lines, start splitting into rules
+
+Example `.claude/rules/testing.md`:
+
+```
+---
+paths:
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+---
+
+# Testing Rules
+
+- Use descriptive test names: "should [expected] when [condition]"
+- Mock external dependencies, not internal modules
+- Clean up side effects in afterEach
+```
+
+## <a id="4-memory"></a>4. [Memory](https://code.claude.com/docs/en/memory) [↑](#table-of-contents)
 
 Claude Code has two kinds of memory that persist across sessions:
 
-- [Auto memory](https://code.claude.com/docs/en/memory#auto-memory): Claude automatically saves useful context like project patterns, key commands, and your preferences. This persists across sessions.
+- **[Auto memory](https://code.claude.com/docs/en/memory#auto-memory):** Claude automatically saves useful context like project patterns, key commands, and your preferences.
+- **[CLAUDE.md files](https://code.claude.com/docs/en/best-practices#write-an-effective-claude-md):** Markdown files you write and maintain with instructions, rules, and preferences for Claude to follow.
 
-- [CLAUDE.md files](https://code.claude.com/docs/en/best-practices#write-an-effective-claude-md): Markdown files you write and maintain with instructions, rules, and preferences for Claude to follow.
+Both are loaded into Claude’s context at the start of every session. Auto memory loads only the first 200 lines of its main file.
 
-Both are loaded into Claude’s context at the start of every session, though auto memory loads only the first 200 lines of its main file.
+### Memory locations
 
-Claude Code offers several memory locations in a hierarchical structure, each serving a different purpose:
+| Memory Type | Location | Shared With |
+| --- | --- | --- |
+| Managed policy | `/etc/claude-code/CLAUDE.md` (Linux)<br>`/Library/Application Support/ClaudeCode/CLAUDE.md` (macOS)<br>`C:\Program Files\ClaudeCode\CLAUDE.md` (Windows) | All users in organization |
+| Project memory | `./CLAUDE.md` or `./.claude/CLAUDE.md` | Team (via source control) |
+| [Project rules](https://code.claude.com/docs/en/memory#modular-rules-with-claude/rules/) | `./.claude/rules/*.md` | Team (via source control) |
+| User memory | `~/.claude/CLAUDE.md` | Just you (all projects) |
+| Project memory (local) | `./CLAUDE.local.md` | Just you (current project) |
+| Auto memory | `~/.claude/projects/<project>/memory/` | Just you (per project) |
 
-| Memory Type                                                                              | Location                                                                                                                                              | Purpose                                             | Use Case Examples                                                    | Shared With                     |
-| ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------- |
-| Managed policy                                                                           | • macOS: /Library/Application Support/ClaudeCode/CLAUDE.md<br>• Linux: /etc/claude-code/CLAUDE.md<br>• Windows: C:\Program Files\ClaudeCode\CLAUDE.md | Organization-wide instructions managed by IT/DevOps | Company coding standards, security policies, compliance requirements | All users in organization       |
-| Project memory                                                                           | ./CLAUDE.md or ./.claude/CLAUDE.md                                                                                                                    | Team-shared instructions for the project            | Project architecture, coding standards, common workflows             | Team members via source control |
-| [Project rules](https://code.claude.com/docs/en/memory#modular-rules-with-claude/rules/) | ./.claude/rules/\*.md                                                                                                                                 | Modular, topic-specific project instructions        | Language-specific guidelines, testing conventions, API standards     | Team members via source control |
-| User memory                                                                              | ~/.claude/CLAUDE.md                                                                                                                                   | Personal preferences for all projects               | Code styling preferences, personal tooling shortcuts                 | Just you (all projects)         |
-| Project memory (local)                                                                   | ./CLAUDE.local.md                                                                                                                                     | Personal project-specific preferences               | Your sandbox URLs, preferred test data                               | Just you (current project)      |
-| Auto memory                                                                              | ~/.claude/projects/<project>/memory/                                                                                                                  | Claude’s automatic notes and learnings              | Project patterns, debugging insights, architecture notes             | Just you (per project)          |
+### Commands
 
-`/init` to create CLAUDE.md file
+- `/init` — create a `CLAUDE.md` file for the project
+- `/memory` — save context manually
 
-`/memory` to save context. You can place CLAUDE.md files in several locations:
+### CLAUDE.md placement
 
-- User-level: `~/.claude/CLAUDE.md` - applies to all projects
+- `~/.claude/CLAUDE.md` — user-level, applies to all projects
+- `./CLAUDE.md` — project-level, applies to current project
+- Parent directories — useful for monorepos (`root/CLAUDE.md` and `root/foo/CLAUDE.md` both load automatically)
+- Child directories — Claude pulls in child `CLAUDE.md` files on demand when working in those directories
+- Subagent memory — stored in `.claude/agent-memory/`; first 200 lines (max 25KB) of `MEMORY.md` loaded into subagent system prompt. [More detail](https://code.claude.com/docs/en/sub-agents#enable-persistent-memory)
 
-- Project-level: `./CLAUDE.md` - applies only to current project
+### [Auto dream](https://www.reddit.com/r/ClaudeCode/comments/1s2ci4f/claude_code_can_now_dream/)
 
-- Parent directories: Useful for monorepos where both `root/CLAUDE.md` and `root/foo/CLAUDE.md` are pulled in automatically
+Claude Code's Autodream is an automatic "background cleanup" and organization system for your Claude memories, so each new session feels sharp instead of fuzzy or clutterred. How it work:
 
-- Child directories: Claude pulls in child `CLAUDE.md` files on demand when working with files in those directories
+- Reviews all past session transcripts (even 900+)
+- Identifies what’s still relevant
+- Prunes stale or contradictory memories
+- Consolidates everything into organized, indexed files
+- Replaces vague references like "today" with actual dates
 
-## <a id="4-skills"></a>4. [Skills](https://code.claude.com/docs/en/skills) [↑](#table-of-contents)
+Runs in the background without interrupting your work. Triggers only after 24 hours + 5 sessions since last consolidation. Read-only on project code, write access to memory files. Uses a lock file to prevent conflicts.
+
+Set Auto dream on by `/memory` and  you can run by `/dream` or  by natural language by saying "Run your auto dream".
+
+### Memory layers
+
+```
+Surface layer: Normal sessions
+            | captures
+            v
+Middle layer: Auto-memory (records, decisions, patterns)
+            | organizes
+            v
+Background layer: Auto-dream (cleans & indexes memory)
+```
+
+
+## <a id="5-skills"></a>5. [Skills](https://code.claude.com/docs/en/skills) [↑](#table-of-contents)
 
 Create `SKILL.md` file and skill folder at project scope in `.claude/skills/` or user scope in `~/.claude/skills/` to give Claude domain knowledge and reusable workflows. Invoke a skill directly with `/skill-name` or let Claude load it automatically when relevant.
 
@@ -330,7 +384,12 @@ Skill(deploy *)
 
 - **Hide individual skills** by adding `disable-model-invocation: true` to their frontmatter. This removes the skill from Claude’s context entirely.
 
-## <a id="5-subagents"></a>5. [Subagents](https://code.claude.com/docs/en/sub-agents) [↑](#table-of-contents)
+### [Claude skill 2.0 ✨](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md)
+
+Skill-creator now helps you write evals, run benchmarks, and keep your skills working as models evolve. These updates are available now in Claude.ai and Cowork, as a plugin for Claude Code, and within our repo. [More detail](https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills)
+
+
+## <a id="6-subagents"></a>6. [Subagents](https://code.claude.com/docs/en/sub-agents) [↑](#table-of-contents)
 
 Define specialized assistants at project scope in `.claude/agents/` or user scope in `~/.claude/agents/` that Claude can delegate to for isolated tasks. Use the `/agents` command to generate with Claude or configure manually. You can also create subagents manually using markdown files.
 
@@ -344,7 +403,7 @@ Define specialized assistants at project scope in `.claude/agents/` or user scop
 
 Or all tools.
 
-## <a id="6-agent-teams"></a>6. [Agent teams](https://code.claude.com/docs/en/agent-teams) [↑](#table-of-contents)
+## <a id="7-agent-teams"></a>7. [Agent teams](https://code.claude.com/docs/en/agent-teams) [↑](#table-of-contents)
 
 Agent teams let you coordinate multiple Claude Code instances working together. One session acts as the team lead, coordinating work, assigning tasks, and synthesizing results. Teammates work independently, each in its own context window, and communicate directly with each other. Unlike subagents, which run within a single session and can only report back to the main agent, you can also interact with individual teammates directly without going through the lead.
 
@@ -474,7 +533,7 @@ Explore related approaches for parallel work and delegation:
 
 - **Manual parallel sessions**: Git worktrees let you run multiple Claude Code sessions yourself without automated team coordination
 
-## <a id="7-mcp"></a>7. [MCP](https://code.claude.com/docs/en/mcp) [↑](#table-of-contents)
+## <a id="8-mcp"></a>8. [MCP](https://code.claude.com/docs/en/mcp) [↑](#table-of-contents)
 
 Usage:
 
@@ -577,7 +636,7 @@ claude mcp add -s user search-papers -- uv --directory /home/locch/Works/mcp-ser
 
 After add, you can run `claude mcp serve` to start the server and run `claude mcp list` to see the list of servers. In interactive mode use `/mcp`
 
-## <a id="8-hooks"></a>8. [Hooks](https://code.claude.com/docs/en/hooks-guide) [↑](#table-of-contents)
+## <a id="9-hooks"></a>9. [Hooks](https://code.claude.com/docs/en/hooks-guide) [↑](#table-of-contents)
 
 [Hooks](https://code.claude.com/docs/en/hooks) are user-defined shell commands or LLM prompts that execute automatically at specific points in Claude Code’s lifecycle. Run `/hooks` for interactive configuration, or edit `.claude/settings.json` directly. The fastest way to create a hook is through the `/hooks` interactive menu in Claude Code. This walkthrough creates a desktop notification hook, so you get alerted whenever Claude is waiting for your input instead of watching the terminal.
 
@@ -1036,7 +1095,7 @@ Then register in `.claude/settings.json`:
 - Avoid unconditional `echo` in `~/.zshrc`/`~/.bashrc` — it contaminates hook JSON output. Wrap them: `if [[ $- == *i* ]]; then echo "..."; fi`
 - To prevent infinite loops in `Stop` hooks, check `stop_hook_active` from input: if `true`, exit 0.
 
-## <a id="9-plugins"></a>9. [Plugins](https://code.claude.com/docs/en/plugins) [↑](#table-of-contents)
+## <a id="10-plugins"></a>10. [Plugins](https://code.claude.com/docs/en/plugins) [↑](#table-of-contents)
 
 Plugins extend Claude Code with skills, agents, hooks, and MCP servers — packaged for sharing across projects and teams. Run `/plugin` to browse and install from marketplaces.
 
@@ -1136,7 +1195,7 @@ What changes when migrating:
 | Hooks configuration | Hooks in settings.json        | Hooks in hooks/hooks.json      |
 | Sharing method      | Must manually copy to share   | Install with /plugin install   |
 
-## <a id="10-manage-your-session"></a>10. [Manage your session](https://code.claude.com/docs/en/best-practices#manage-your-session) [↑](#table-of-contents)
+## <a id="11-manage-your-session"></a>11. [Manage your session](https://code.claude.com/docs/en/best-practices#manage-your-session) [↑](#table-of-contents)
 
 `Esc` - Stop Claude mid-action with the Esc key.
 
@@ -1179,15 +1238,46 @@ To reference specific lines from multiple files, use `@file#line-range` syntax i
 
 You can combine multiple file references in a single prompt.
 
-## <a id="11-slash-commands"></a>11. Slash commands [↑](#table-of-contents)
+## <a id="12-slash-commands"></a>12. Slash commands [↑](#table-of-contents)
 
 For built-in commands like `/help` and `/compact`, see [interactive mode](https://code.claude.com/docs/en/interactive-mode#built-in-commands).
+
+### Predefined slash commands
+
+| Command | Shows |
+|---|---|
+| `/usage` | Show plan usage limits |
+| `/context` | Token usage by category: system prompt, memory files, skills, MCP tools, and messages |
+| `/memory` | Which CLAUDE.md and rules files loaded, plus auto-memory entries |
+| `/agents` | Configured subagents and their settings |
+| `/hooks` | Active hook configurations |
+| `/mcp` | Connected MCP servers and their status |
+| `/skills` | Available skills from project, user, and plugin sources |
+| `/permissions` | Current allow and deny rules |
+| `/doctor` | Installation and configuration diagnostics |
+| `/rewind` | Restore the code and/or conversation to a previous point |
+| `/compact` | Clear conversation history but keep a summary in context |
+| `/rename` | Rename the current conversation |
+
+Some new slash commands✨:
+
+| Command | Shows |
+|---|---|
+| `/btw` | Ask a quick side question without interrupting the main conversation. [More detail](https://code.claude.com/docs/en/interactive-mode#side-questions-with-/btw) |
+| `/dream` | Run Claude Code auto dream, you can activate by natural language by saying "Run your auto dream" |
+| `/loop` | *(loop command)* [More detail](https://code.claude.com/docs/en/scheduled-tasks#schedule-a-recurring-prompt-with-/loop) |
+| `/review` | Review a pull request |
+| `/pr-comments` | Get comments from a GitHub pull request |
+| `/security-review` | Complete a security review of the pending changes on the current branch |
+
+
+### Custom slash commands
 
 Custom slash commands have been merged into skills. A file at `.claude/commands/review.md` and a skill at `.claude/skills/review/SKILL.md` both create `/review` and work the same way. Your existing `.claude/commands/` files keep working. Skills add optional features: a directory for supporting files, frontmatter to [control whether you or Claude invokes them](https://code.claude.com/docs/en/skills#control-who-invokes-a-skill), and the ability for Claude to load them automatically when relevant.
 
 Files in `.claude/commands/` still work and support the same frontmatter. Skills are recommended since they support additional features like supporting files.
 
-## <a id="12-worktrees"></a>12. [Worktrees](https://code.claude.com/docs/en/common-workflows#run-parallel-claude-code-sessions-with-git-worktrees) [↑](#table-of-contents)
+## <a id="13-worktrees"></a>13. [Worktrees](https://code.claude.com/docs/en/common-workflows#run-parallel-claude-code-sessions-with-git-worktrees) [↑](#table-of-contents)
 
 ### Basic
 
@@ -1313,7 +1403,7 @@ cd ../myapp
 git merge feature-x
 ```
 
-## <a id="13-claude-code-on-github"></a>13. Claude code on GitHub [↑](#table-of-contents)
+## <a id="14-claude-code-on-github"></a>14. Claude code on GitHub [↑](#table-of-contents)
 
 Claude Code supports 3 commands related to GitHub:
 
@@ -1328,15 +1418,15 @@ After connecting Claude with GitHub, you can run `/install-github-app` to instal
 
 [more details](https://github.com/marketplace/actions/claude-code-action-official)
 
-## <a id="14-spec-driven"></a>14. Spec-driven [↑](#table-of-contents)
+## <a id="15-spec-driven"></a>15. Spec-driven [↑](#table-of-contents)
 
 [More detail](./spec-driven-development.md)
 
-## <a id="15-ralph-loop"></a>15. Ralph Loop [↑](#table-of-contents)
+## <a id="16-ralph-loop"></a>16. Ralph Loop [↑](#table-of-contents)
 
 [More detail](./claude-code-enhancement.md#-ralph-loop)
 
-## <a id="16-status-line"></a>16. [Status line](https://code.claude.com/docs/en/statusline) [↑](#table-of-contents)
+## <a id="17-status-line"></a>17. [Status line](https://code.claude.com/docs/en/statusline) [↑](#table-of-contents)
 
 Prerequisite : `sudo apt install jq`
 
