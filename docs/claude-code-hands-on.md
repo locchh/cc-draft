@@ -14,7 +14,7 @@
 - [8. Hooks](#8-hooks)
 - [9. Plugins](#9-plugins)
 - [10. Manage your session](#10-manage-your-session)
-- [11. Custom slash commands](#11-custom-slash-commands)
+- [11. Custom slash commands](#11-slash-commands)
 - [12. Worktrees](#12-worktrees)
 - [13. Claude code on GitHub](#13-claude-code-on-github)
 - [14. Spec-driven](#14-spec-driven) 🔥
