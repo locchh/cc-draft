@@ -156,6 +156,13 @@ Waterfall treats software like construction: lay the foundation before the walls
 
 > _"For every decision, define how you'll prove it worked."_
 
+```ascii
+Requirements ————————————————— Acceptance Test
+    Architecture ————————— Integration Test
+        Design ———————— System Test
+            Code — Unit Test
+```
+
 An evolution of Waterfall for high-stakes domains. At every stage of development, you define a corresponding test that will prove the work was done correctly. Requirements get acceptance tests. Architecture gets integration tests. Code gets unit tests. Nothing moves forward without a plan for verifying it — because in aviation or medical devices, "it seemed to work" isn't good enough.
 
 **Use when:** Safety-critical systems where correctness must be formally proven at every level.
