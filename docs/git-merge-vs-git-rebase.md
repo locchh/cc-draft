@@ -13,8 +13,6 @@ rebase: main → your feature (you catch up)
 merge:  your feature → main (you ship)
 ```
 
----
-
 ## 2. Understanding the Three Layers
 
 There are 3 things, not 2:
@@ -78,8 +76,6 @@ git checkout --detach origin/main  # detached HEAD, no branch created
 git checkout feature/your-branch   # return to your work
 ```
 
----
-
 ## 3. Git Merge
 
 Combines histories by creating a new merge commit. In real workflow, **you never run this manually** — it happens when you click "Merge pull request" on GitHub, GitLab, Bitbucket, or VS Code's Source Control panel.
@@ -112,8 +108,6 @@ feature: D - E - [M] <- "merged main into feature" — this is just noise
 ```
 
 Reviewers see this extra commit mixed in with your real work. Use `git rebase origin/main` instead (see §4).
-
----
 
 ## 4. Git Rebase
 
@@ -156,8 +150,6 @@ git rebase origin/main     # replay your commits on top
 - Rewriting a branch others have cloned breaks their history
 - This is a local operation — no one sees it until you `git push`
 
----
-
 ## 5. Interactive Rebase: Cleaning Up History
 
 ### `git rebase origin/main`
@@ -190,8 +182,6 @@ pick ghi "add login feature" # squash all 3 into 1 clean commit
 |---|---|
 | `rebase origin/main` | Just catching up, commits are already clean |
 | `rebase -i origin/main` | Before opening PR, want to clean up messy history |
-
----
 
 ## 6. Resolving Conflicts
 
@@ -265,8 +255,6 @@ git merge --abort    # same for merge
 
 No harm done — you're back to the state before you started.
 
----
-
 ## 7. Professional Daily Workflow
 
 ```bash
@@ -296,8 +284,6 @@ git push origin feature/TICKET-123-short-description
 - Use `git merge main` locally to catch up
 - Maintain a local `main` branch — delete it, use `origin/main`
 - Leave stale branches for weeks
-
----
 
 ## 8. Golden Rules
 
