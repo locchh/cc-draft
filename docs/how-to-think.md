@@ -31,7 +31,7 @@ Toyota discovered in the 1950s that most time in any production process is not s
 
 ---
 
-### 3. Agile
+### 3. Agile ( Able to move quickly and change direction without losing balance )
 
 > _"Responding to change over following a plan."_ — Agile Manifesto
 
