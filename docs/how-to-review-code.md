@@ -54,6 +54,7 @@ If you swap positions — stand on `B` and run `git diff A` — the `+` and `-` 
 Full diff of all changes between local and remote
 
 ```bash
+git fetch
 git diff HEAD origin/<your-remote-branch>
 ```
 
