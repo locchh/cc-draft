@@ -5,6 +5,7 @@
 Both commands integrate changes from one branch into another, but in different directions and for different purposes.
 
 > **merge** = integrate your work **into** the product (feature → main)
+
 > **rebase** = integrate the product's updates **into** your work (main → feature)
 
 ```
@@ -12,17 +13,15 @@ rebase: main → your feature (you catch up)
 merge: your feature → main (you ship)
 ```
 
----
-
 ## 2. Understanding the Three Layers
 
 There are 3 things, not 2:
 
-| Name | Where | Description |
-|---|---|---|
-| Remote branch | On GitHub server | The real `main` on GitHub, always latest |
-| Remote tracking branch | On your local machine | `origin/main` — a local cached copy of GitHub's `main` |
-| Local branch | On your local machine | Your `main`, `feature`, etc. |
+|No| Name | Where | Description |
+|---|---|---|---|
+|1| Remote branch | On GitHub server | The real `main` on GitHub, always latest |
+|2| Remote tracking branch | On your local machine | `origin/main` — a local cached copy of GitHub's `main` |
+|3| Local branch | On your local machine | Your `main`, `feature`, etc. |
 
 ### `origin/main` is a local cache, not GitHub itself
 
@@ -61,49 +60,78 @@ local main → unchanged ✗
 local dev → unchanged ✗
 ```
 
----
-
 ## 3. Git Merge
 
-Combines histories by creating a new merge commit.
+Combines histories by creating a new merge commit. In real workflow, **you never run this manually** — it happens when you click "Merge pull request" on GitHub, GitLab, Bitbucket, or VS Code's Source Control panel.
+
+```
+main: A - B -  C -------\
+                         \
+feature:        D - E - [M] <- merge commit (created by GitHub/VS Code)
+```
+
+- `[M]` has two parents: the tip of `main` and the tip of `feature`
+- Full history is preserved — you can always see where the branch came from
+- Creates an extra merge commit `[M]` in `main` (this is fine and expected)
+- **You do this via PR, MR on GitHub/GitLab/Bitbucket/Azure DevOps, not the terminal**
+
+### What the UI does under the hood
+
+When you click "Merge pull request", GitHub/VS Code runs:
 
 ```bash
-git checkout feature
-git merge main
+git checkout main
+git merge feature/your-branch  # creates [M] on main
 ```
 
-```
-main: A - B - C --------\
-\ \
-feature: D - E - [M] <- merge commit
-```
-
-- History is preserved as-is
-- Creates an extra merge commit `[M]`
-- Safe for shared/public branches
-- Used when **shipping** (feature → main), typically via PR on GitHub
+You just never see it.
 
 ---
 
 ## 4. Git Rebase
 
-Replays your commits on top of the target branch. No merge commit.
+Takes your commits and **replants them on top of the latest main**. No merge commit — history stays linear.
+
+### Before rebase
+
+Your feature branch was created when main was at `B`. Main has since moved to `C`.
+
+```
+main:    A - B - C
+              \
+feature:       D - E   (based on B, now behind)
+```
+
+### After `git rebase origin/main`
+
+Git lifts `D` and `E` off their old base and replays them after `C`:
+
+```
+main:    A - B - C
+                  \
+feature:           D' - E'   (rebased on C, now up to date)
+```
+
+### Why D' and E' (not D and E)?
+
+Rebase **rewrites** your commits. Each replayed commit gets:
+- A new parent (previously `B`, now `C`)
+- A new commit hash
+
+The content of your changes is the same, but the commits are technically new objects.
+
+### How to run it
 
 ```bash
-git checkout feature
-git rebase origin/main
+git fetch                  # update origin/main cache
+git rebase origin/main     # replay your commits on top
 ```
 
-```
-main: A - B - C
-\
-feature: D' - E' <- new commits (replayed)
-```
+### Rules
 
-- History is linear and clean
-- `D'` and `E'` are new commits with new hashes
-- **Never rebase a public/shared branch** — it rewrites history
-- Used when **catching up** locally before opening a PR
+- Only rebase **your own local/feature branches** — never a shared branch
+- Rewriting a branch others have cloned breaks their history
+- This is a local operation — no one sees it until you `git push`
 
 ---
 
@@ -142,24 +170,35 @@ Even after `git fetch`, these are **not the same**:
 
 | Branch | Purpose |
 |---|---|
-| GitHub `main` | Source of truth, protected, never pushed directly |
-| `origin/main` | Local cache, used for rebasing feature branches |
-| local `main` | Where you build, test, and run locally |
-| local `feature` | Where you develop |
+| GitHub `main` | Source of truth, protected, never pushed directly |
+| `origin/main` | Local cache, used for rebasing feature branches |
+| local `main` | Optional — senior devs often delete it entirely |
+| local `feature` | Where you develop |
 
-### When you need to build/test from main
+### Senior devs: delete local `main`
+
+Local `main` goes stale and is never needed. You can safely delete it:
 
 ```bash
-git checkout main
-git pull # fetch + merge origin/main into local main
-# now build, test, run
+git branch -d main
+```
+
+`origin/main` is always up to date after `git fetch` — that's all you need.
+
+### If you need to build/test from latest main
+
+```bash
+git fetch
+git checkout --detach origin/main  # detached HEAD, no branch created
+# build, test, run
+git checkout feature/your-branch   # return to your work
 ```
 
 ### When you are developing a feature
 
 ```bash
 git fetch
-git rebase origin/main # no need to touch local main at all
+git rebase origin/main  # origin/main is enough — no local main needed
 ```
 
 ---
@@ -199,15 +238,77 @@ pick ghi "add login feature" # squash all 3 into 1 clean commit
 
 ---
 
-## 9. Conflict Handling
+## 9. Resolving Conflicts
 
-Both merge and rebase can produce conflicts.
+A conflict happens when two branches edit the **same line** in the same file. Git can't decide which version to keep — it stops and asks you to choose.
+
+### What a conflict looks like
+
+When Git hits a conflict, it injects markers directly into the file:
+
+```
+<<<<<<< HEAD (your branch)
+const timeout = 3000;
+=======
+const timeout = 5000;
+>>>>>>> origin/main
+```
+
+- `<<<<<<< HEAD` — your version
+- `=======` — divider
+- `>>>>>>> origin/main` — the incoming version
+
+You must edit the file to remove the markers and leave only the correct code.
+
+### Step-by-step: resolve in terminal
+
+```bash
+# 1. See which files have conflicts
+git status
+# → both modified: src/config.ts
+
+# 2. Open the file, find the markers, fix the code manually
+# (remove <<<, ===, >>> and keep the right version)
+
+# 3. Stage the resolved file
+git add src/config.ts
+
+# 4. Continue (do NOT commit manually during rebase)
+git rebase --continue   # or: git merge --continue
+```
+
+### Step-by-step: resolve in VS Code
+
+VS Code has built-in conflict UI — no need to edit markers by hand.
+
+1. Open the conflicted file — VS Code highlights the conflict block
+2. Click one of the options above the block:
+   - **Accept Current Change** — keep your version
+   - **Accept Incoming Change** — keep their version
+   - **Accept Both Changes** — keep both (stacked)
+   - **Compare Changes** — see a side-by-side diff
+3. Save the file
+4. In the Source Control panel, stage the file
+5. Run `git rebase --continue` or `git merge --continue` in the terminal
+
+### Rebase vs merge: key difference when conflicting
 
 | | Merge | Rebase |
 |---|---|---|
-| Resolve conflicts | Once | Per replayed commit |
-| Continue after resolve | `git merge --continue` | `git rebase --continue` |
-| Abort | `git merge --abort` | `git rebase --abort` |
+| Conflicts appear | Once, all at once | One per replayed commit |
+| After resolving | `git merge --continue` | `git rebase --continue` |
+| Abort everything | `git merge --abort` | `git rebase --abort` |
+
+With rebase, if you have 3 commits and 2 of them conflict with main, you resolve conflicts **twice** — once per commit as Git replays them.
+
+### If it gets too messy — abort
+
+```bash
+git rebase --abort   # restores your branch to exactly where it was before
+git merge --abort    # same for merge
+```
+
+No harm done — you're back to the state before you started.
 
 ---
 
@@ -259,4 +360,3 @@ feature (local)
 └── rebased to catch up with main
 └── pushed → PR → merged on GitHub
 ```
-
