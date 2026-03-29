@@ -4,87 +4,114 @@
 
 Both commands integrate changes from one branch into another, but in different directions and for different purposes.
 
-> **merge** = integrate your work **into** the product (feature → main)
+> **merge** = integrate your work **into** the product (feature → main)
 
-> **rebase** = integrate the product's updates **into** your work (main → feature)
+> **rebase** = integrate the product's updates **into** your work (main → feature)
 
 ```
 rebase: main → your feature (you catch up)
-merge: your feature → main (you ship)
+merge:  your feature → main (you ship)
 ```
+
+---
 
 ## 2. Understanding the Three Layers
 
 There are 3 things, not 2:
 
-|No| Name | Where | Description |
+| No | Name | Where | Purpose |
 |---|---|---|---|
-|1| Remote branch | On GitHub server | The real `main` on GitHub, always latest |
-|2| Remote tracking branch | On your local machine | `origin/main` — a local cached copy of GitHub's `main` |
-|3| Local branch | On your local machine | Your `main`, `feature`, etc. |
+| 1 | Remote branch | GitHub server | Source of truth — the real `main` |
+| 2 | Remote tracking branch | Your machine (read-only) | `origin/main` — cached copy, updated by `git fetch` |
+| 3 | Local branch | Your machine | `feature`, etc. — where you work |
 
-### `origin/main` is a local cache, not GitHub itself
+### `origin/main` is a local cache, not GitHub itself
 
-`origin/main` lives on **your machine** inside `.git/refs/remotes/origin/main`. It is a read-only, cached representation of what GitHub looked like the last time you fetched.
+`origin/main` lives on **your machine** inside `.git/refs/remotes/origin/main`. It is a read-only snapshot of what GitHub looked like the last time you fetched.
 
 ```
 GitHub (real): main → A-B-C-D
-↑
+        ↑
 git fetch (refresh cache)
-↓
+        ↓
 Your machine: origin/main → A-B-C-D (cache, read-only)
-main → A-B (your local branch, untouched)
 ```
 
-**Analogy:** Think of it like a news app on your phone.
-- GitHub = the actual news server
-- `origin/main` = news cached on your phone
-- `git fetch` = hitting refresh to get latest news
+**Analogy:** Think of it like a news app on your phone.
+- GitHub = the actual news server
+- `origin/main` = news cached on your phone
+- `git fetch` = hitting refresh to get latest news
 
-### What `git fetch` does (and does NOT do)
+### What `git fetch` does (and does NOT do)
 
 | Command | What it updates |
 |---|---|
-| `git fetch` | Only `origin/*` (remote tracking branches) |
-| `git pull` | `fetch` + auto-merges into your current local branch |
+| `git fetch` | Only `origin/*` (remote tracking branches) |
+| `git pull` | `fetch` + auto-merges into your current local branch |
 
-`git fetch` is "safe" — it never touches your local branches or working files.
+`git fetch` is "safe" — it never touches your local branches or working files.
 
 ```
 After git fetch:
 
 origin/main → updated ✓
-origin/dev → updated ✓
+origin/dev  → updated ✓
 
-local main → unchanged ✗
-local dev → unchanged ✗
+local feature → unchanged ✗
 ```
+
+### Local `main` is optional — senior devs delete it
+
+`git fetch` updates `origin/main` but does **not** update your local `main` — it goes stale immediately. You never need it. Delete it:
+
+```bash
+git branch -d main
+```
+
+`origin/main` is always fresh after `git fetch` — use that instead.
+
+```bash
+# If you need to build/test from latest main:
+git fetch
+git checkout --detach origin/main  # detached HEAD, no branch created
+# build, test, run
+git checkout feature/your-branch   # return to your work
+```
+
+---
 
 ## 3. Git Merge
 
 Combines histories by creating a new merge commit. In real workflow, **you never run this manually** — it happens when you click "Merge pull request" on GitHub, GitLab, Bitbucket, or VS Code's Source Control panel.
 
 ```
-main: A - B -  C -------\
-                         \
-feature:        D - E - [M] <- merge commit (created by GitHub/VS Code)
+main: A - B - C ----------\
+                           \
+feature:      D  -  E   -  [M] <- merge commit (created by GitHub/VS Code)
 ```
 
 - `[M]` has two parents: the tip of `main` and the tip of `feature`
 - Full history is preserved — you can always see where the branch came from
-- Creates an extra merge commit `[M]` in `main` (this is fine and expected)
-- **You do this via PR, MR on GitHub/GitLab/Bitbucket/Azure DevOps, not the terminal**
+- **You do this via PR/MR, not the terminal**
 
 ### What the UI does under the hood
 
-When you click "Merge pull request", GitHub/VS Code runs:
+When you click "Merge pull request":
 
 ```bash
 git checkout main
 git merge feature/your-branch  # creates [M] on main
 ```
 
-You just never see it.
+### Never use `git merge` locally to catch up
+
+Some developers run `git merge main` on their feature branch to pull in upstream changes. Don't — it litters your feature branch with a noisy merge commit:
+
+```
+feature: D - E - [M] <- "merged main into feature" — this is just noise
+```
+
+Reviewers see this extra commit mixed in with your real work. Use `git rebase origin/main` instead (see §4).
 
 ---
 
@@ -114,11 +141,7 @@ feature:           D' - E'   (rebased on C, now up to date)
 
 ### Why D' and E' (not D and E)?
 
-Rebase **rewrites** your commits. Each replayed commit gets:
-- A new parent (previously `B`, now `C`)
-- A new commit hash
-
-The content of your changes is the same, but the commits are technically new objects.
+Rebase **rewrites** your commits. Each replayed commit gets a new parent and a new hash. The content of your changes is the same, but they are technically new objects.
 
 ### How to run it
 
@@ -135,81 +158,13 @@ git rebase origin/main     # replay your commits on top
 
 ---
 
-## 5. Why `git merge main` locally is discouraged
-
-Using `git merge main` locally to catch up creates a noisy merge commit in your feature branch:
-
-```
-feature: D - E - [M] <- "merged main into feature" — this is just noise
-```
-
-When you open a PR, reviewers see this extra merge commit mixed in with your actual work. It makes history harder to read.
-
-**Rule of thumb:**
-- `merge` flows one direction — feature → main (shipping)
-- `rebase` flows the other direction — main → feature (catching up)
-
----
-
-## 6. `git merge main` vs `git merge origin/main`
-
-Even after `git fetch`, these are **not the same**:
-
-| | Source | Up to date after fetch? |
-|---|---|---|
-| `git merge main` | Your local `main` branch | No — local main is still stale |
-| `git merge origin/main` | Remote tracking cache | Yes ✓ |
-
-`git fetch` updates `origin/main` but does **not** update your local `main`. To make local `main` match `origin/main`, you'd need to checkout main and pull.
-
-**Always prefer `origin/main` as the reference.**
-
----
-
-## 7. Branch Purposes Summary
-
-| Branch | Purpose |
-|---|---|
-| GitHub `main` | Source of truth, protected, never pushed directly |
-| `origin/main` | Local cache, used for rebasing feature branches |
-| local `main` | Optional — senior devs often delete it entirely |
-| local `feature` | Where you develop |
-
-### Senior devs: delete local `main`
-
-Local `main` goes stale and is never needed. You can safely delete it:
-
-```bash
-git branch -d main
-```
-
-`origin/main` is always up to date after `git fetch` — that's all you need.
-
-### If you need to build/test from latest main
-
-```bash
-git fetch
-git checkout --detach origin/main  # detached HEAD, no branch created
-# build, test, run
-git checkout feature/your-branch   # return to your work
-```
-
-### When you are developing a feature
-
-```bash
-git fetch
-git rebase origin/main  # origin/main is enough — no local main needed
-```
-
----
-
-## 8. Interactive Rebase: Cleaning Up History
+## 5. Interactive Rebase: Cleaning Up History
 
 ### `git rebase origin/main`
 Just replays your commits on top of latest main. Automatic.
 
 ### `git rebase -i origin/main`
-`-i` = interactive. Opens an editor to clean up commits before replaying.
+`-i` = interactive. Opens an editor to clean up commits before replaying.
 
 ```
 pick abc "wip"
@@ -226,19 +181,19 @@ pick ghi "add login feature" # squash all 3 into 1 clean commit
 
 | Command | What it does |
 |---|---|
-| `pick` | Keep commit as-is |
-| `squash` | Merge into previous commit |
-| `reword` | Keep commit but edit the message |
-| `drop` | Delete commit entirely |
+| `pick` | Keep commit as-is |
+| `squash` | Merge into previous commit |
+| `reword` | Keep commit but edit the message |
+| `drop` | Delete commit entirely |
 
 | | When to use |
 |---|---|
-| `rebase origin/main` | Just catching up, commits are already clean |
-| `rebase -i origin/main` | Before opening PR, want to clean up messy history |
+| `rebase origin/main` | Just catching up, commits are already clean |
+| `rebase -i origin/main` | Before opening PR, want to clean up messy history |
 
 ---
 
-## 9. Resolving Conflicts
+## 6. Resolving Conflicts
 
 A conflict happens when two branches edit the **same line** in the same file. Git can't decide which version to keep — it stops and asks you to choose.
 
@@ -299,7 +254,7 @@ VS Code has built-in conflict UI — no need to edit markers by hand.
 | After resolving | `git merge --continue` | `git rebase --continue` |
 | Abort everything | `git merge --abort` | `git rebase --abort` |
 
-With rebase, if you have 3 commits and 2 of them conflict with main, you resolve conflicts **twice** — once per commit as Git replays them.
+With rebase, if you have 3 commits and 2 of them conflict, you resolve conflicts **twice** — once per commit as Git replays them.
 
 ### If it gets too messy — abort
 
@@ -312,7 +267,7 @@ No harm done — you're back to the state before you started.
 
 ---
 
-## 10. Professional Daily Workflow
+## 7. Professional Daily Workflow
 
 ```bash
 # Start a new feature
@@ -336,14 +291,15 @@ git push origin feature/TICKET-123-short-description
 ```
 
 ### Senior developers never:
-- Force push to `main`
-- Commit directly to `main`
-- Use `git merge main` locally to catch up
-- Leave stale branches for weeks
+- Force push to `main`
+- Commit directly to `main`
+- Use `git merge main` locally to catch up
+- Maintain a local `main` branch — delete it, use `origin/main`
+- Leave stale branches for weeks
 
 ---
 
-## 11. Golden Rules
+## 8. Golden Rules
 
 > **Rebase to clean up your local work. Merge to integrate into shared history.**
 
@@ -357,6 +313,6 @@ main (protected, on GitHub)
 └── merged via PR only (never directly pushed)
 
 feature (local)
-└── rebased to catch up with main
+└── rebased to catch up with origin/main
 └── pushed → PR → merged on GitHub
 ```
