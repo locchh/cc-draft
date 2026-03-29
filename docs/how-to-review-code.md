@@ -413,3 +413,5 @@ Hunk body:
   -       removed line  → only in old branch
   +       added line    → only in new branch
 ```
+
+[A successful Git branching model](https://nvie.com/posts/a-successful-git-branching-model/)
