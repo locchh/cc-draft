@@ -258,8 +258,12 @@ No harm done — you're back to the state before you started.
 ## 7. Professional Daily Workflow
 
 ```bash
+# Clone repo
+git clone ...
+git branch -D main
+
 # Start a new feature
-git checkout -b feature/TICKET-123-short-description
+git checkout -b feature/TICKET-123-short-description origin/main
 
 # Do your work
 git add .
