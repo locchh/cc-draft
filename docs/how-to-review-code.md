@@ -55,7 +55,10 @@ Full diff of all changes between local and remote
 
 ```bash
 git fetch
+# Only compares committed states, ignoring any uncommitted modifications
 git diff HEAD origin/<your-remote-branch>
+# Compares your working tree (including uncommitted changes) to that remote branch
+git diff origin/<your-remote-branch>
 ```
 
 ---
