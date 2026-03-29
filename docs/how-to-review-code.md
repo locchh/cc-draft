@@ -35,31 +35,52 @@ A **MR (Merge Request) / PR (Pull Request)** is a request to apply a diff from o
 
 ---
 
-## Running Git Diff Between Two Local Branches
+## Running Git Diff — Two Forms
+
+There are two forms, and the order of "old" vs "new" differs between them.
+
+### Single-argument form (while checked out on a branch)
 
 ```bash
-# Stand on branch A, compare with branch B
-git diff B
+# Stand on branch feature, compare with main
+git diff main
 ```
 
-- **Current branch** (`A`) = **new version** (`+++`)
-- **Argument branch** (`B`) = **old version** (`---`)
+- **Current branch** (`feature`) = **new version** (`+++`)
+- **Argument branch** (`main`) = **old version** (`---`)
 
 > **Rule:** current branch is always "new", argument branch is always "old".
 
-If you swap positions — stand on `B` and run `git diff A` — the `+` and `-` lines are completely flipped.
+If you swap — stand on `main` and run `git diff feature` — the `+` and `-` lines flip completely.
 
-## Running Git Diff Between Local Branch and Remote Branch
+### Two-argument form (explicit, recommended for PR review)
 
-Full diff of all changes between local and remote
+```bash
+git diff <old> <new>
+git diff main feature
+```
+
+- **First argument** (`main`) = **old version** (`---`)
+- **Second argument** (`feature`) = **new version** (`+++`)
+
+> **Rule:** first argument is always "old", second argument is always "new".
+
+The naming looks like the opposite of the single-argument form, but the underlying rule is the same: **argument = old**. In the two-argument form, both are arguments, so first = old, second = new.
+
+### Comparing against remote tracking branches (best practice)
+
+Local branches can be stale if you haven't pulled recently. Always compare remote tracking branches to get the true state of each branch:
 
 ```bash
 git fetch
-# Only compares committed states, ignoring any uncommitted modifications
-git diff HEAD origin/<your-remote-branch>
-# Compares your working tree (including uncommitted changes) to that remote branch
-git diff origin/<your-remote-branch>
+git diff origin/<old-branch> origin/<new-branch>
 ```
+
+| Form | Old (`---`) | New (`+++`) |
+|------|------------|------------|
+| `git diff B` (on branch A) | B (argument) | A (current) |
+| `git diff A B` | A (first) | B (second) |
+| `git diff origin/main origin/feature` | origin/main (first) | origin/feature (second) |
 
 ---
 
@@ -253,7 +274,7 @@ The standard PR review workflow:
 # 1. Get latest remote state
 git fetch                                                                                                                                                                    
 
-# 2. See what commits the feature added
+# 2. See what commits the feature added (Before and After)
 git log origin/main..origin/feature --oneline                                        
 
 # 3. See the full file changes
@@ -353,15 +374,29 @@ Neither tool replaces a human reviewer — they are a first pass that catches th
 # Quick Reference Cheat Sheet
 
 ```
-git diff <other-branch>
-         ↑
-         This becomes "old" (---)
-         Your current branch becomes "new" (+++)
+Single-argument form (on branch A):
+  git diff B
+           ↑
+           B = old (---)
+           A (current) = new (+++)
+
+Two-argument form:
+  git diff <old> <new>
+           ↑      ↑
+           old    new
+           (---)  (+++)
+
+PR review best practice:
+  git fetch
+  git diff origin/main origin/feature
+                ↑              ↑
+               old            new
+              (---)           (+++)
 
 File header:
   diff --git a/file b/file   → which file
-  --- a/file                 → old version marker
-  +++ b/file                 → new version marker
+  --- a/file                 → old version (first arg)
+  +++ b/file                 → new version (second arg)
 
 Hunk header:
   @@ -old_start,old_count +new_start,new_count @@ function_name
