@@ -303,7 +303,12 @@ Devin Review was built around a specific insight: as AI generates more code, the
 
 **How it works:**
 
-Devin Review connects to your repository via a GitHub App with `Contents: read` access — it pulls the full source on its own cloud infrastructure, not yours. This is what enables it to detect moved or copied code across the codebase, not just within the diff. Rather than reading a diff as a flat list of changed lines, it reorganizes changes semantically — grouping related edits together and detecting when code was moved or copied, so those show as relocations rather than full deletes and re-inserts. This makes the diff genuinely easier for a human to read even before the AI analysis begins.
+Devin Review comes in two modes:
+
+- **Webapp (fast review)** — analyzes the diff directly using a pre-indexed snapshot of the repo for codebase context. No fresh clone. Quick turnaround, good for most PRs.
+- **CLI (`devin-review`) (deep review)** — fetches the PR branch and checks it out into a local git worktree. The Bug Catcher can read any file on demand (`cat`, `grep`, `find`, etc.), giving it full file-level context beyond the diff. More thorough, but requires local setup.
+
+Rather than reading a diff as a flat list of changed lines, it reorganizes changes semantically — grouping related edits together and detecting when code was moved or copied, so those show as relocations rather than full deletes and re-inserts. This makes the diff genuinely easier for a human to read even before the AI analysis begins.
 
 On top of that, an integrated **Bug Catcher** analyzes the PR and categorizes its findings into two types:
 
@@ -357,7 +362,7 @@ Both tools post inline comments on GitHub PRs without blocking existing review w
 
 |                             | Devin Review                               | Claude Code Review                             |
 | --------------------------- | ------------------------------------------ | ---------------------------------------------- |
-| **Source access**           | GitHub App, pulls full repo on their cloud | GitHub App, pulls full repo on Anthropic infra |
+| **Source access**           | Webapp (fast): diff + pre-indexed context. CLI (deep): full worktree checkout | GitHub App, full repo on Anthropic infra |
 | **Core idea**               | Reorganize the diff + bug detection        | Multi-agent parallel analysis of full codebase |
 | **Severity system**         | Bugs (severe/non-severe) + Flags           | 🔴 Normal / 🟡 Nit / 🟣 Pre-existing           |
 | **Default scope**           | Bugs and code understanding                | Correctness bugs only                          |
@@ -365,7 +370,7 @@ Both tools post inline comments on GitHub PRs without blocking existing review w
 | **Manual trigger**          | Add enrolled user as reviewer              | Comment `@claude review` on PR                 |
 | **False positive handling** | Confidence levels on findings              | Verification step filters before posting       |
 
-**Both branches are required.** When a PR targets `main`, the tools pull the full source of both the PR branch and `main`. Reading only the diff isn't enough — a change that looks correct in isolation can break something elsewhere in `main` that was never touched by the PR. This is also why cost scales with codebase size, not just PR size: the larger `main` is, the more context the agents have to load and analyze.
+**Reading only the diff isn't enough.** A change that looks correct in isolation can break something elsewhere in the codebase that was never touched by the PR. Claude Code Review accesses the full repository to catch these cross-file issues. Devin Review's webapp mode uses a pre-indexed snapshot for this context, while the CLI mode checks out the full worktree locally. For Claude Code Review, cost scales with codebase size, not just PR size: the larger the repo, the more context the agents load and analyze.
 
 Neither tool replaces a human reviewer — they are a first pass that catches the obvious problems so human attention can focus on intent, architecture, and judgment calls that AI cannot make.
 
