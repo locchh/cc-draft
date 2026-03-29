@@ -81,19 +81,19 @@ When David Heinemeier Hansson released Ruby on Rails in 2004, he noticed that de
 
 ---
 
-### 8. SOLID
+### 8. SOLID (Separate Or Limit Its Dependencies)
 
-> _"The goal of software architecture is to minimize the human resources required to build and maintain the required system."_ — Robert C. Martin
+> _"Write code so that when you change one thing, only that one thing changes."
 
 Robert C. Martin distilled decades of painful object-oriented lessons into five principles that keep code changeable over time. Violate them and the codebase slowly becomes a place where every change breaks something unexpected.
 
-|       | Principle             | Meaning                                 |
-| ----- | --------------------- | --------------------------------------- |
-| **S** | Single Responsibility | A class does one thing                  |
-| **O** | Open/Closed           | Extend without modifying                |
-| **L** | Liskov Substitution   | Subclasses replace parents safely       |
-| **I** | Interface Segregation | Don't force unused interfaces           |
-| **D** | Dependency Inversion  | Depend on abstractions, not concretions |
+|       | Principle             | Meaning                                 |    Fights against                      |
+| ----- | --------------------- | --------------------------------------- |--------------------------------------- |
+| **S** | Single Responsibility | Separate concerns — one class, one job, a class does one thing|  One change affects unrelated things   |
+| **O** | Open/Closed           | Open to extend, closed to change, extend without modifying |  Editing old code introduces new bugs  |
+| **L** | Liskov Substitution   | Let children replace parents, subclasses replace parents safely |  Swapping parts breaks the system      |
+| **I** | Interface Segregation | Isolate what you need, don't force unused interfaces           |  One change forces unrelated classes to change too  |
+| **D** | Dependency Inversion  | Depend on abstractions, not concretions |  High-level logic breaks when low-level details change |
 
 **Ref:** Robert C. Martin, [_Clean Architecture_](https://www.amazon.com/Clean-Architecture-Craftsmans-Software-Structure/dp/0134494164) (2017)
 
@@ -109,7 +109,7 @@ A null slipping through five layers of code before causing a cryptic crash is on
 
 ---
 
-### 10. DRY
+### 10. DRY ( Don't Repeat Yourself )
 
 > _"Every piece of knowledge must have a single, unambiguous, authoritative representation within a system."_ — Andrew Hunt & David Thomas
 
@@ -119,7 +119,7 @@ When the same logic lives in two places, you've created a silent promise that bo
 
 ---
 
-### 11. KISS
+### 11. KISS ( Keep It Simple, Stupid )
 
 > _"Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it."_ — Brian Kernighan
 
@@ -129,7 +129,7 @@ Every layer of cleverness you add is a layer the next person — or future you �
 
 ---
 
-### 12. YAGNI
+### 12. YAGNI ( You Aren't Gonna Need It )
 
 > _"Always implement things when you actually need them, never when you just foresee that you need them."_ — Ron Jeffries
 
