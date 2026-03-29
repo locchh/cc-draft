@@ -380,10 +380,10 @@ Neither tool replaces a human reviewer — they are a first pass that catches th
 
 ```
 Single-argument form (on branch A):
-  git diff B
+  git diff A
            ↑
-           B = old (---)
-           A (current) = new (+++)
+           A = old (---)
+           B (current) = new (+++)
 
 Two-argument form:
   git diff <old> <new>
