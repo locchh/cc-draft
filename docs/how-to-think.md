@@ -9,7 +9,7 @@ Philosophy   — mindset & values
 
 ---
 
-## Philosophies
+## Philosophies ( The why and what to believe )
 
 ### 1. Systems Thinking
 
@@ -139,7 +139,7 @@ Developers are optimists by nature — they build for futures that rarely arrive
 
 ---
 
-## Methodologies
+## Methodologies ( The how to do )
 
 ### 1. Waterfall
 
