@@ -740,6 +740,25 @@ git reset --hard HEAD~1          # undo last commit and discard changes
 
 ## <a id="17-docker"></a>17. Docker [↑](#table-of-contents)
 
+### Setup
+
+```bash
+# Add Docker's official GPG key and repo
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | sudo tee /etc/apt/sources.list.d/docker.list
+
+# Install
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Allow running without sudo
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Verify
+docker run hello-world
+```
+
 ### `docker ps` — List running containers
 
 ```bash
